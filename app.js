@@ -5,6 +5,10 @@ const express = require('express')
 const app = express()
 const port = 3000
 
+// Gzip 압축을 사용하면 response body 사이즈를 줄일 수 있어서, 웹앱의 속도를 높일 수 있다.
+const compression = require('compression');
+app.use(compression())
+
 // 모든 api 호출에 대하여 가장 먼저 실행되는 middleware 등록
 const {consoleLogger} = require('./middleware/logger')
 app.use(consoleLogger);
@@ -56,16 +60,12 @@ app.get('/chaining', (req, res) => {
     res.send('chaining test code');
 })
 
-app.get('/error', (req, res) => {
-    parseInt(eeeerrrrrorrrr);
-    res.send('success???')
-    next()
-})
-
 
 // 라우터를 이용하여 특정 서비스 레벨로 middleware 와 route 를 분리한다.
 // 기본적인 라우터 구성 형태
 const bookRouter = require('./service/book/router')
+const { fstat } = require('fs')
+const { hasUncaughtExceptionCaptureCallback } = require('process')
 // router level 에 등록된 모듈을 /book url 에 매핑한다.
 app.use('/book', bookRouter);
 
@@ -75,7 +75,15 @@ const memberRouter = require('./service/member/router')(express, {info1: "부가
 app.use('/member', memberRouter);
 
 
-// error 용 middleware 에서 next 가 필요없더라도 인수 개수를 맞춰줘야 error middleware 로 인식하므로 반드시 명시해야함.
+
+// 여러가지 에러 처리방법에 대해 정리 
+require('./app-error')(app);
+
+
+
+    
+
+// error 처리 middleware 에서 next 가 필요없더라도 인수 개수를 맞춰줘야 error middleware 로 인식하므로 반드시 명시해야함.
 // application stack 의 끝에 오류 처리를 둘 수 있도록 한다.
 app.use((err, req, res, next) => {
     console.error(err.stack)
