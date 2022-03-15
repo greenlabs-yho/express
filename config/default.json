@@ -1,0 +1,10 @@
+{
+    "databaseConfig": {
+        "Database": "database1",
+        "User": "user1", 
+        "Password": "password1", 
+        "Host": "localhost",
+        "Port": 3306,
+        "Product": "mysql"
+    }
+}

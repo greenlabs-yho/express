@@ -1,4 +1,5 @@
 const path = require('path')
+const bodyParser = require('body-parser')
 
 // express 프레임워크 추가
 const express = require('express')
@@ -15,6 +16,42 @@ app.use(consoleLogger);
 
 // public 폴더의 파일들을 /static 이하 url 을 통해 접근하도록 설정
 app.use('/static', express.static(path.join(__dirname, 'public')));
+
+// swagger setting
+const YAML = require('yamljs');
+const swaggerUi = require('swagger-ui-express')
+const { resolveRefs } = require('json-refs');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(YAML.load('./swagger.yaml')));
+
+// 단일파일 불러오기가 아니라 파일진 파일을 불러오려면 아래 로직이 들어가야함.
+(async() => {
+    const multiFileSwagger = (root) => {
+        // 상대 또는 원격 대상의 json파일을 참조하기위한 설정
+        const refOptions = {
+          filter: ['relative', 'remote'],
+          loaderOptions: {
+            processContent: (res, callback) => {
+              // json파일이 아니므로 yaml파일을 변환하여 callback
+              callback(null, YAML.parse(res.text));
+            },
+          },
+        };
+    
+        // root : 대상이 되는 파일의 경로
+        return resolveRefs(root, refOptions).then(
+          (results) => results.resolved,
+          (err) => {
+            console.log(err.stack);
+          },
+        );
+      };
+    
+      // swagger-jsdoc 방식을 사용하거나, 단일 YAML 파일을 사용한다면 multiFileSwagger 는 필요 없음.
+      const swaggerDocument = await multiFileSwagger(YAML.load('./swagger.yaml'));
+      app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));    
+})()
+
+
 
 
 // root url 에 get 메소드 route 정의
@@ -64,8 +101,6 @@ app.get('/chaining', (req, res) => {
 // 라우터를 이용하여 특정 서비스 레벨로 middleware 와 route 를 분리한다.
 // 기본적인 라우터 구성 형태
 const bookRouter = require('./service/book/router')
-const { fstat } = require('fs')
-const { hasUncaughtExceptionCaptureCallback } = require('process')
 // router level 에 등록된 모듈을 /book url 에 매핑한다.
 app.use('/book', bookRouter);
 
@@ -74,12 +109,13 @@ app.use('/book', bookRouter);
 const memberRouter = require('./service/member/router')(express, {info1: "부가적인 정보", info2: "실행할때 사용될만한 정보들"})
 app.use('/member', memberRouter);
 
+// sequelize 를 적용한 예시
+const userRouter = require('./service/user/router')(express)
+app.use('/user', userRouter);
 
 
 // 여러가지 에러 처리방법에 대해 정리 
 require('./app-error')(app);
-
-
 
     
 
