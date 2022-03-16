@@ -113,6 +113,11 @@ app.use('/member', memberRouter);
 const userRouter = require('./service/user/router')(express)
 app.use('/user', userRouter);
 
+// SequelizeManager 를 적용한 예시
+const runtripRouter = require('./service/runtrip/router')(express)
+app.use('/runtrip', runtripRouter);
+
+
 
 // 여러가지 에러 처리방법에 대해 정리 
 require('./app-error')(app);
@@ -127,6 +132,13 @@ app.use((err, req, res, next) => {
 });
 
 // 서버 구동 시작
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`listening on port ${port}`)
 });
+
+
+// 서버 종료 작업
+process.on('SIGINT', () => {
+  server.close();
+  console.log("server closed");
+})

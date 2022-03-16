@@ -51,11 +51,20 @@ const getTableConnection = async() => {
 }
 
 // service/xxx.js 에 해당.
-const getUserInfo = async() => {
+const getUserInfo_old = async() => {
   const conn = await getTableConnection();
   const result = await conn.models.user.findAll()
 
   //conn.sequelize.close();
+  return result
+}
+
+
+// 새로운 버전
+const dbInfo = require("..");
+const getUserInfo = async() => {
+  const result = dbInfo.userModel.findAll();
+  
   return result
 }
 
