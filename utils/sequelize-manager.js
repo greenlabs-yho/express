@@ -2,7 +2,6 @@ const config = require('config');
 const databaseConfig = config.get('databaseConfig');
 
 const { Sequelize, DataTypes } = require('sequelize');
-const { sequelize } = require('../service');
 
 // dbName 별 sequelize객체를 관리 (process 가 살아있는동안 계속 유지)
 const sequelizeDict = {}

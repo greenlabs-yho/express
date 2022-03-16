@@ -2,12 +2,13 @@
 // 핵심은 동기, 비동기, Promise 에서 발생한 오류를 express 에서 인지하도록 구성하는 것.
 
 // 사용자정의 에러 처리기 정상작동 하지 않는 경우.
-// 1. next(err) 하기 전에 res.headersSent 처럼 
+// 1. next(err) 하기 전에 res.headersSend 처럼 이미 response 를 한 경우
+// 2. 비동기 로직에서 오류가 발생해서 res 를 정상적으로 호출하지 못한 경우
 
 module.exports = (app) => {
     const fs = require('fs')
 
-    // 에러 테스트용 API
+    // 동기 에러 테스트용 API
     let errorValue = 0
     app.get('/error', (req, res, next) => {
         errorValue++;
@@ -23,7 +24,7 @@ module.exports = (app) => {
         }
     })
 
-    // 에러 테스트용 API
+    // 비동기 에러 테스트용 API
     app.get('/new-error', [
         // 비동기 함수를 사용할 때 callback 함수에서 error 만 반환하는 경우
         // 콜백함수 부분에 next 를 사용하여 error 가 없으면 다음 핸들러를 호출하고
@@ -37,7 +38,7 @@ module.exports = (app) => {
     ]);
 
 
-    // 에러 테스트용 API
+    // 비동기 try-catch 에러 테스트용 API
     app.get('/async-error', (req, res, next) => {
         setTimeout(() => {
             try {
@@ -53,7 +54,7 @@ module.exports = (app) => {
     })
 
 
-    // 에러 테스트용 API
+    // promise 에러 테스트용 API
     app.get('/promise-error', (req, res, next) => {
         // promise 의 모든 오류는 catch 핸들러에 집결되므로 next 를 바로 연결하여 처리하도록 할 수 있다.
         Promise.resolve().then(() => {
@@ -62,7 +63,7 @@ module.exports = (app) => {
     })
 
     
-    // 에러 테스트용 API
+    // 비동기 에러 테스트용 API
     app.get('/pass-sync-error', (req, res, next) => {
         fs.readFile(
             './test/tmp.txt', 
