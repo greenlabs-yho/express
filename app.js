@@ -1,6 +1,8 @@
+// 외부로 공개되는 API 에서 공통적으로 적용할 time zone
+process.env.TZ = 'Asia/Seoul';
+
 const path = require('path')
 const bodyParser = require('body-parser')
-
 // express 프레임워크 추가
 const express = require('express')
 const app = express()
@@ -118,6 +120,11 @@ const runtripRouter = require('./service/runtrip/router')(express)
 app.use('/runtrip', runtripRouter);
 
 
+// ws-api refactoring
+const serviceList = ['salesSlips', ]
+serviceList.forEach(serviceModule => {
+  app.use(`/${serviceModule}`, require(`./service/${serviceModule}/route`))
+})
 
 // 여러가지 에러 처리방법에 대해 정리 
 require('./app-error')(app);
