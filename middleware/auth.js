@@ -5,7 +5,7 @@ module.exports.ws_api_auth = (req, res, next) => {
     if (req.header('temp_api_key') === TEMP_API_KEY) {
       next();
     } else {
-      throw 'Unauthenticated';
+      throw Error('Unauthenticated');
     }
   } catch (error) {
     console.error(error);

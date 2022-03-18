@@ -129,6 +129,16 @@ serviceList.forEach(serviceModule => {
 // 여러가지 에러 처리방법에 대해 정리 
 require('./app-error')(app);
 
+
+
+
+app.get('/seq', async (req, res) => {
+
+
+    res.json(result)
+  
+})
+
     
 
 // error 처리 middleware 에서 next 가 필요없더라도 인수 개수를 맞춰줘야 error middleware 로 인식하므로 반드시 명시해야함.

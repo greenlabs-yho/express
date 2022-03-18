@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const SequelizeManager = require('./sequelize-manager');
+
 const config = require('config');
 const databaseConfig = config.get('databaseConfig');
 
@@ -47,7 +48,7 @@ async function getTablePrefix(user_code) {
       return `${type}${year}`;
     }
     return null;
-  }
+}
 
 
 module.exports = {getConnection, getTablePrefix}

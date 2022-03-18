@@ -1,70 +1,35 @@
 const config = require('config');
-const databaseConfig = config.get('databaseConfig');
-
+const databaseConfig = config.get('personalDBConfig');
 const { Sequelize, DataTypes, QueryTypes } = require('sequelize');
 
-// models/xxx/yyy.js 에 해당
-class User extends Sequelize.Model {
-  static init(sequelize) {
-    super.init({
-      id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-      },
-      email: DataTypes.STRING,
-      name: DataTypes.STRING,
-      display_name: DataTypes.STRING
-    }, {
-      sequelize,
-      tableName: 'users',
-      timestamps: false
-    })
-
-    return User;
-  }
-}
-
-// utils/database.js 에 해당.
-const getTableConnection = async() => {
-    try {  
-        const sequelize = new Sequelize(databaseConfig.Database, databaseConfig.User, databaseConfig.Password, {
-            host: databaseConfig.Host,
-            dialect: databaseConfig.Product,
-            pool: {
-              max: 5,
-              min: 0,
-              acquire: 30000,
-              idel:10000
-            }
-        });
-        const userModel = User.init(sequelize);
-
-        return {
-          sequelize,
-          models: {user: userModel}
-        }
-
-    } catch (error) {
-      throw error;
-    }
-}
-
-// service/xxx.js 에 해당.
-const getUserInfo_old = async() => {
-  const conn = await getTableConnection();
-  const result = await conn.models.user.findAll()
-
-  //conn.sequelize.close();
-  return result
-}
 
 
-// 새로운 버전
-const dbInfo = require("..");
 const getUserInfo = async() => {
-  const result = dbInfo.userModel.findAll();
-  
+  const s1 = new Sequelize(databaseConfig.Database, databaseConfig.User, databaseConfig.Password, {
+      host: databaseConfig.Host,
+      dialect: 'mysql'});
+
+  const s2 = new Sequelize(databaseConfig.Database, databaseConfig.User, databaseConfig.Password, {
+    host: databaseConfig.Host,
+    dialect: 'mysql'});
+
+  const t1 = await s1.transaction();
+  const t2 = await s2.transaction();
+
+  try {
+
+    await s1.query("update topic set title = 'wow3' where id = 4", {type: QueryTypes.UPDATE, transaction: t1} );
+    await s2.query("update topic set title = 'test3' where id = 5", {type: QueryTypes.UPDATE, transaction: t2} );
+
+    await t1.commit();
+    await t2.commit();
+  } catch (error) {
+    await t1.rollback();
+    await t2.rollback();
+  }
+
+  const result = await s1.query("select title from topic where id in (4, 5)", {type: QueryTypes.SELECT})
+    
   return result
 }
 
