@@ -50,6 +50,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(YAML.load('./swagger.yaml'
     
       // swagger-jsdoc 방식을 사용하거나, 단일 YAML 파일을 사용한다면 multiFileSwagger 는 필요 없음.
       const swaggerDocument = await multiFileSwagger(YAML.load('./swagger.yaml'));
+      if(Array.isArray(swaggerDocument.paths)) {
+        const newPaths = {}
+        swaggerDocument.paths.forEach(path => {
+          Object.assign(newPaths, path)
+        })
+        swaggerDocument.paths = newPaths;
+      }
       app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));    
 })()
 

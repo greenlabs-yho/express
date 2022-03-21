@@ -21,3 +21,13 @@ exports.getPageNation = (limit, pageNum) => {
     };
   };
   
+
+exports.zeroPad = (num, places) => String(num).padStart(places, '0');
+
+
+
+exports.validCheck = (name, value, check_func) => {
+  if (!check_func(value)) {
+    throw new Error(`invalid value [${name}:${value}]`);
+  }
+}

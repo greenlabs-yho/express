@@ -8,8 +8,5 @@ servers:
     description: local server
 
 paths:
-  /book:
-    $ref: './service/book/swagger-doc.yaml'
-
-  /user:
-    $ref: './service/user/swagger-doc.yaml'
+  - $ref: './service/book/swagger-doc.yaml'
+  - $ref: './service/user/swagger-doc.yaml'
