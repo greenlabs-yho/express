@@ -1,0 +1,53 @@
+paths:
+  /book:
+    get:
+      tags:
+        - ./service/book/swagger.yaml 파일
+      summary: Returns a list of users.
+      description: Optional extended description in CommonMark or HTML.
+      parameters:
+        - $ref: '#components/parameters/user_code'
+        - $ref: '#components/parameters/table_prefix'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/test"
+
+
+components:
+  parameters:
+    user_code:
+      in: query
+      name: user_code
+      example: ws_05000
+      schema:
+        type: string
+      description: 농약사 코드를 입력해주세요.
+
+    table_prefix:
+      in: query
+      name: table_prefix
+      example: w2021
+      schema:
+        type: string
+      description: 테이블전위타입을 입력해주세요.
+  schemas:
+    test:
+      type: object
+      properties:
+        CO:
+          type: string
+          description: 이월금액
+        SOTY:
+          type: string
+          description: 금년매입
+    login:
+      type: object
+      properties:
+        w_nosw:
+          type: string
+          description: 농약사 코드(농약사 구분값) 고유번호
+          example: "05000-01"

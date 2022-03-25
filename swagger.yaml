@@ -8,5 +8,16 @@ servers:
     description: local server
 
 paths:
-  - $ref: './service/book/swagger-doc.yaml'
-  - $ref: './service/user/swagger-doc.yaml'
+  /auth:
+    get:
+      tags:
+        - ./swagger.yaml 파일
+      summary: Returns a list of users.
+      description: Optional extended description in CommonMark or HTML.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/test"

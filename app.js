@@ -19,11 +19,14 @@ app.use(consoleLogger);
 // public 폴더의 파일들을 /static 이하 url 을 통해 접근하도록 설정
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
+
+/*
 // swagger setting
 const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express')
 const { resolveRefs } = require('json-refs');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(YAML.load('./swagger.yaml')));
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(YAML.load('./swagger.yaml')));
+
 
 // 단일파일 불러오기가 아니라 파일진 파일을 불러오려면 아래 로직이 들어가야함.
 (async() => {
@@ -60,7 +63,18 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(YAML.load('./swagger.yaml'
       app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));    
 })()
 
+*/
 
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDefinition = YAML.load('./swagger.yaml');
+const options = {
+  swaggerDefinition,
+  apis: ['./service/**/swagger.yaml']
+}
+const swaggerSpec = swaggerJSDoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 // root url 에 get 메소드 route 정의
